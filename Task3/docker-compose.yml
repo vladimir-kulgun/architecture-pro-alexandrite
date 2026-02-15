@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # --- Инфраструктура: Jaeger ---
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686" # UI
+      - "4317:4317"   # OTLP gRPC
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+
+  # --- Сервис Заказов ---
+  order-service:
+    build:
+      context: ./services/OrderService
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - JAEGER_URL=http://jaeger:4317
+      - CALCULATION_SERVICE_URL=http://calculation-service:5002
+    depends_on:
+      - jaeger
+
+  # --- Сервис Расчетов ---
+  calculation-service:
+    build:
+      context: ./services/CalculationService
+      dockerfile: Dockerfile
+    ports:
+      - "5002:5002"
+    environment:
+      - JAEGER_URL=http://jaeger:4317
+    depends_on:
+      - jaeger
