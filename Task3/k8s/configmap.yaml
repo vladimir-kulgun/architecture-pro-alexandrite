@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: services-config
+data:
+  # Используем имя сервиса, которое автоматически создает Jaeger Operator
+  JAEGER_URL: "http://simplest-collector:4317"
+  # Имя сервиса CalculationService из services.yaml
+  CALCULATION_SERVICE_URL: "http://calculation-service:5002"
